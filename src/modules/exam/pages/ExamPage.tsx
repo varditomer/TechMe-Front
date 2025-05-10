@@ -13,14 +13,21 @@ import {
   Radio,
   RadioGroup,
   Typography,
+  Grid,
 } from "@mui/material";
-import Grid from "@mui/material/Grid";
-import type { Question } from "../exam.models";
+import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
+import js from 'react-syntax-highlighter/dist/esm/languages/hljs/javascript';
+import type { Question, ExamResult, ExamSummary } from "../exam.models";
+
+SyntaxHighlighter.registerLanguage('javascript', js);
+
+const TIME_LIMIT = 10 * 60; // 10 minutes in seconds
 
 export default function ExamPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,6 +38,21 @@ export default function ExamPage() {
     }
     setQuestions(JSON.parse(savedQuestions));
   }, [navigate]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          handleSubmit();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   const handleAnswerChange = (questionId: string, answer: string) => {
     setAnswers((prev) => ({ ...prev, [questionId]: answer }));
@@ -48,103 +70,146 @@ export default function ExamPage() {
     }
   };
 
-  const handleSubmit = async () => {
-    try {
-      // For now, just store the answers and navigate to results
-      sessionStorage.setItem("examAnswers", JSON.stringify(answers));
-      navigate("/exam-result");
-    } catch (err) {
-      console.error("Failed to submit exam:", err);
-    }
+  const handleSubmit = () => {
+    const results: ExamResult[] = questions.map((question) => {
+      const userAnswer = answers[question.id] || "";
+      const correctAnswer = question.options[question.correctOptionIndex];
+      return {
+        questionId: question.id,
+        userAnswer,
+        correctAnswer,
+        isCorrect: userAnswer === correctAnswer,
+      };
+    });
+
+    const correctAnswers = results.filter((r) => r.isCorrect).length;
+    const score = Math.round((correctAnswers / questions.length) * 100);
+
+    const summary: ExamSummary = {
+      totalQuestions: questions.length,
+      correctAnswers,
+      score,
+      results,
+    };
+
+    sessionStorage.setItem("examResults", JSON.stringify(summary));
+    navigate("/exam-result");
   };
 
   if (!questions.length) return null;
 
   const currentQuestion = questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
+  const minutes = Math.floor(timeLeft / 60);
+  const seconds = timeLeft % 60;
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
       <Paper elevation={3} sx={{ p: 4 }}>
-        <Typography variant="h4" gutterBottom align="center">
-          Tech Exam
-        </Typography>
-
+        {/* Header */}
         <Box sx={{ mb: 4 }}>
-          <Typography variant="subtitle1" color="text.secondary" align="center">
-            Question {currentQuestionIndex + 1} of {questions.length}
+          <Typography variant="h4" gutterBottom align="center">
+            Tech Exam
           </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="subtitle1" color="text.secondary">
+              Question {currentQuestionIndex + 1} of {questions.length}
+            </Typography>
+            <Typography variant="subtitle1" color="text.secondary">
+              Time Left: {minutes}:{seconds.toString().padStart(2, '0')}
+            </Typography>
+          </Box>
           <Typography variant="body2" color="text.secondary" align="center">
             Technology: {currentQuestion.tech}
           </Typography>
         </Box>
 
-        <Card variant="outlined" sx={{ mb: 4 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              {currentQuestion.question}
-            </Typography>
-
-            <FormControl component="fieldset">
-              <FormLabel component="legend">Select your answer:</FormLabel>
-              <RadioGroup
-                value={currentQuestion.id ? answers[currentQuestion.id] || "" : ""}
-                onChange={(e) => currentQuestion.id && handleAnswerChange(currentQuestion.id, e.target.value)}
-              >
-                {currentQuestion.options.map((option) => (
-                  <FormControlLabel
-                    key={option}
-                    value={option}
-                    control={<Radio />}
-                    label={option}
-                    sx={{
-                      mb: 1,
-                      border: '1px solid #e0e0e0',
-                      borderRadius: 1,
-                      p: 1,
-                      '&:hover': {
-                        backgroundColor: '#f5f5f5'
-                      }
-                    }}
-                  />
-                ))}
-              </RadioGroup>
-            </FormControl>
-          </CardContent>
-        </Card>
-
-        <Grid container spacing={2} justifyContent="space-between">
-          <Grid size={{ xs: 12, sm: 4 }}>
-            <Button
-              variant="outlined"
-              onClick={handlePrevious}
-              disabled={currentQuestionIndex === 0}
-              fullWidth
-            >
-              Previous
-            </Button>
+        <Grid container spacing={4}>
+          {/* Question Section */}
+          <Grid size={6}>
+            <Card variant="outlined" sx={{ height: '100%' }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Question
+                </Typography>
+                <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', mb: 2 }}>
+                  {currentQuestion.question}
+                </Typography>
+                {currentQuestion.code && (
+                  <SyntaxHighlighter
+                    language="javascript"
+                    customStyle={{ borderRadius: '4px' }}
+                  >
+                    {currentQuestion.code}
+                  </SyntaxHighlighter>
+                )}
+              </CardContent>
+            </Card>
           </Grid>
-          <Grid size={{ xs: 12, sm: 4 }}>
-            {isLastQuestion ? (
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSubmit}
-                fullWidth
-              >
-                Submit Exam
-              </Button>
-            ) : (
-              <Button
-                variant="contained"
-                onClick={handleNext}
-                fullWidth
-              >
-                Next
-              </Button>
-            )}
+
+          {/* Answers Section */}
+          <Grid size={6}>
+            <Card variant="outlined" sx={{ height: '100%' }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Your Answer
+                </Typography>
+                <FormControl component="fieldset" sx={{ width: '100%' }}>
+                  <FormLabel component="legend">Select your answer:</FormLabel>
+                  <RadioGroup
+                    value={answers[currentQuestion.id] || ""}
+                    onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
+                  >
+                    {currentQuestion.options.map((option) => (
+                      <FormControlLabel
+                        key={option}
+                        value={option}
+                        control={<Radio />}
+                        label={option}
+                        sx={{
+                          mb: 1,
+                          border: '1px solid #e0e0e0',
+                          borderRadius: 1,
+                          p: 1,
+                          '&:hover': {
+                            backgroundColor: '#f5f5f5'
+                          }
+                        }}
+                      />
+                    ))}
+                  </RadioGroup>
+                </FormControl>
+              </CardContent>
+            </Card>
           </Grid>
         </Grid>
+
+        {/* Navigation Footer */}
+        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
+          <Button
+            variant="outlined"
+            onClick={handlePrevious}
+            disabled={currentQuestionIndex === 0}
+          >
+            Previous
+          </Button>
+          {isLastQuestion ? (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleSubmit}
+            >
+              Submit Exam
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              onClick={handleNext}
+            >
+              Next
+            </Button>
+          )}
+        </Box>
       </Paper>
     </Container>
   );

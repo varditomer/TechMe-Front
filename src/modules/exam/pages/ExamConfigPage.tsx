@@ -5,43 +5,56 @@ import {
   Button,
   Card,
   CardContent,
-  Checkbox,
   Container,
+  FormControl,
   FormControlLabel,
+  FormLabel,
   Paper,
-  Slider,
+  Radio,
+  RadioGroup,
   Typography,
+  Grid,
 } from "@mui/material";
-import Grid from "@mui/material/Grid";
 import type { Tech } from "../exam.models";
 import { examService } from "../exam.service";
 
 export default function ExamConfigPage() {
   const [techs, setTechs] = useState<Tech[]>([]);
-  const [selectedTechs, setSelectedTechs] = useState<string[]>([]);
-  const [numPerTech, setNumPerTech] = useState(5);
+  const [selectedTech, setSelectedTech] = useState("");
+  const [questionCount, setQuestionCount] = useState(10);
   const navigate = useNavigate();
 
   useEffect(() => {
-    examService.getTechs().then(setTechs);
+    const loadTechs = async () => {
+      try {
+        const techs = await examService.getTechs();
+        setTechs(techs);
+      } catch (err) {
+        console.error("Failed to load technologies:", err);
+      }
+    };
+    loadTechs();
   }, []);
 
-  const handleTechToggle = (id: string) => {
-    setSelectedTechs((prev) =>
-      prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id]
-    );
-  };
-
-  const startExam = async () => {
-    if (!selectedTechs.length || !numPerTech) return;
+  const handleStart = async () => {
+    if (!selectedTech) {
+      alert("Please select a technology");
+      return;
+    }
 
     try {
       const questions = await examService.startExam({
-        techs: selectedTechs,
-        numPerTech,
+        techs: [selectedTech],
+        numPerTech: questionCount,
       });
       sessionStorage.setItem("examQuestions", JSON.stringify(questions));
-      navigate("/exam");
+      navigate("/exam-welcome", { 
+        state: { 
+          tech: techs.find(t => t.id === selectedTech),
+          questionCount,
+          timeLimit: 10 // 10 minutes
+        } 
+      });
     } catch (err) {
       console.error("Failed to start exam:", err);
     }
@@ -51,70 +64,60 @@ export default function ExamConfigPage() {
     <Container maxWidth="md" sx={{ py: 4 }}>
       <Paper elevation={3} sx={{ p: 4 }}>
         <Typography variant="h4" gutterBottom align="center">
-          Start Your Tech Exam
-        </Typography>
-        
-        <Typography variant="subtitle1" color="text.secondary" align="center" sx={{ mb: 4 }}>
-          Select technologies and configure your exam settings
+          Configure Your Exam
         </Typography>
 
         <Grid container spacing={4}>
-          {/* Technologies Selection */}
-          <Grid size={{ xs: 12 }}>
+          {/* Technology Selection */}
+          <Grid size={6}>
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  Select Technologies
+                  Select Technology
                 </Typography>
-                <Grid container spacing={2}>
-                  {techs.map((tech) => (
-                    <Grid size={{ xs: 12, sm: 6, md: 4 }} key={tech.id}>
+                <FormControl component="fieldset">
+                  <FormLabel component="legend">Choose a technology to test:</FormLabel>
+                  <RadioGroup
+                    value={selectedTech}
+                    onChange={(e) => setSelectedTech(e.target.value)}
+                  >
+                    {techs.map((tech) => (
                       <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={selectedTechs.includes(tech.id)}
-                            onChange={() => handleTechToggle(tech.id)}
-                          />
-                        }
+                        key={tech.id}
+                        value={tech.id}
+                        control={<Radio />}
                         label={tech.name}
-                        sx={{
-                          width: '100%',
-                          border: '1px solid #e0e0e0',
-                          borderRadius: 1,
-                          p: 1,
-                          '&:hover': {
-                            backgroundColor: '#f5f5f5'
-                          }
-                        }}
                       />
-                    </Grid>
-                  ))}
-                </Grid>
+                    ))}
+                  </RadioGroup>
+                </FormControl>
               </CardContent>
             </Card>
           </Grid>
 
-          {/* Questions Per Tech */}
-          <Grid size={{ xs: 12 }}>
+          {/* Question Count Selection */}
+          <Grid size={6}>
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  Questions per Technology
+                  Number of Questions
                 </Typography>
-                <Box sx={{ px: 2 }}>
-                  <Slider
-                    value={numPerTech}
-                    onChange={(_, value) => setNumPerTech(value as number)}
-                    min={1}
-                    max={10}
-                    marks
-                    step={1}
-                    valueLabelDisplay="auto"
-                  />
-                  <Typography variant="body2" color="text.secondary" align="center">
-                    {numPerTech} questions per technology
-                  </Typography>
-                </Box>
+                <FormControl component="fieldset">
+                  <FormLabel component="legend">Select number of questions:</FormLabel>
+                  <RadioGroup
+                    value={questionCount}
+                    onChange={(e) => setQuestionCount(Number(e.target.value))}
+                  >
+                    {[5, 10, 15, 20].map((count) => (
+                      <FormControlLabel
+                        key={count}
+                        value={count}
+                        control={<Radio />}
+                        label={`${count} questions`}
+                      />
+                    ))}
+                  </RadioGroup>
+                </FormControl>
               </CardContent>
             </Card>
           </Grid>
@@ -124,8 +127,7 @@ export default function ExamConfigPage() {
           <Button
             variant="contained"
             size="large"
-            onClick={startExam}
-            disabled={!selectedTechs.length}
+            onClick={handleStart}
             sx={{ minWidth: 200 }}
           >
             Start Exam
