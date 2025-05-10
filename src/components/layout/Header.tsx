@@ -17,7 +17,7 @@ import {
   Language as LanguageIcon,
   Code as CodeIcon,
 } from "@mui/icons-material";
-import { useThemeContext } from "../../contexts/ThemeContext";
+import { useThemeContext } from "../../hooks/useThemeContext";
 
 export default function Header() {
   const { i18n } = useTranslation();
