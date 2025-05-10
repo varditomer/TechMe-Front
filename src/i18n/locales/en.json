@@ -1,0 +1,59 @@
+{
+  "common": {
+    "home": "Home",
+    "settings": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode"
+  },
+  "footer": {
+    "allRightsReserved": "All rights reserved.",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "contact": "Contact"
+  },
+  "exam": {
+    "title": "Quiz",
+    "configure": "Configure Your Quiz",
+    "selectTech": "Select Technology",
+    "selectQuestions": "Number of Questions",
+    "questions": "questions",
+    "startExam": "Start Quiz",
+    "question": "Question",
+    "of": "of",
+    "timeLeft": "Time Left",
+    "technology": "Technology",
+    "yourAnswer": "Your Answer",
+    "selectAnswer": "Select your answer",
+    "previous": "Previous",
+    "next": "Next",
+    "submit": "Submit Quiz",
+    "welcome": {
+      "title": "Welcome to {{tech}} Quiz",
+      "details": "Quiz Details",
+      "questions": "You will be presented with {{count}} questions about {{tech}}",
+      "timeLimit": "Time limit: {{time}} minutes",
+      "notes": "Important Notes",
+      "navigation": "You can navigate between questions using the Previous and Next buttons",
+      "timer": "A timer will be displayed at the top of the page",
+      "noPause": "The quiz cannot be paused once started",
+      "autoSubmit": "The quiz will be automatically submitted when time runs out",
+      "start": "Start Quiz"
+    },
+    "results": {
+      "title": "Quiz Results",
+      "summary": "Summary",
+      "totalQuestions": "Total Questions",
+      "correctAnswers": "Correct Answers",
+      "score": "Score",
+      "detailedResults": "Detailed Results",
+      "question": "Question",
+      "yourAnswer": "Your Answer",
+      "correctAnswer": "Correct Answer",
+      "correct": "Correct",
+      "incorrect": "Incorrect",
+      "startNewQuiz": "Start New Quiz"
+    }
+  }
+} 

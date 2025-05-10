@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Box,
   Button,
@@ -18,6 +19,7 @@ interface ExamWelcomePageProps {
 }
 
 export default function ExamWelcomePage({ tech, questionCount, timeLimit }: ExamWelcomePageProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const handleStart = () => {
@@ -28,7 +30,7 @@ export default function ExamWelcomePage({ tech, questionCount, timeLimit }: Exam
     <Container maxWidth="md" sx={{ py: 4 }}>
       <Paper elevation={3} sx={{ p: 4 }}>
         <Typography variant="h4" gutterBottom align="center">
-          {tech.name} Quiz
+          {t('exam.welcome.title', { tech: tech.name })}
         </Typography>
 
         <Grid container spacing={4}>
@@ -36,42 +38,42 @@ export default function ExamWelcomePage({ tech, questionCount, timeLimit }: Exam
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  Exam Details
+                  {t('exam.welcome.details')}
                 </Typography>
                 <Grid container spacing={2}>
                   <Grid size={12}>
                     <Typography variant="body1" paragraph>
-                      This quiz consists of {questionCount} {tech.name} questions.
+                      {t('exam.welcome.questions', { count: questionCount, tech: tech.name })}
                     </Typography>
                   </Grid>
                   <Grid size={12}>
                     <Typography variant="body1" paragraph>
-                      You will have {timeLimit} minutes to complete the quiz.
+                      {t('exam.welcome.timeLimit', { time: timeLimit })}
                     </Typography>
                   </Grid>
                   <Grid size={12}>
                     <Typography variant="body1" paragraph>
-                      Important Notes:
+                      {t('exam.welcome.notes')}:
                     </Typography>
                     <ul>
                       <li>
                         <Typography variant="body1">
-                          You can navigate between questions using the Previous and Next buttons
+                          {t('exam.welcome.navigation')}
                         </Typography>
                       </li>
                       <li>
                         <Typography variant="body1">
-                          The timer will start as soon as you begin the quiz
+                          {t('exam.welcome.timer')}
                         </Typography>
                       </li>
                       <li>
                         <Typography variant="body1">
-                          Once started, you cannot pause the quiz
+                          {t('exam.welcome.noPause')}
                         </Typography>
                       </li>
                       <li>
                         <Typography variant="body1">
-                          The quiz will automatically submit when time runs out
+                          {t('exam.welcome.autoSubmit')}
                         </Typography>
                       </li>
                     </ul>
@@ -89,7 +91,7 @@ export default function ExamWelcomePage({ tech, questionCount, timeLimit }: Exam
             onClick={handleStart}
             sx={{ minWidth: 200 }}
           >
-            Start Quiz
+            {t('exam.welcome.start')}
           </Button>
         </Box>
       </Paper>

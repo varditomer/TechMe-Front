@@ -1,17 +1,24 @@
-import { Route, Routes } from "react-router-dom";
-import ExamConfigPage from "./modules/exam/pages/ExamConfigPage";
-import ExamPage from "./modules/exam/pages/ExamPage";
+import { ThemeProvider } from './contexts/ThemeContext';
+import Header from './components/layout/Header';
+import Footer from './components/layout/Footer';
+import AppRoutes from './routes';
+import './i18n';
 
 function App() {
   return (
-    <>
-      <div className="App">
-        <Routes>
-          <Route path="/" element={<ExamConfigPage />} />
-          <Route path="/exam" element={<ExamPage />} />
-        </Routes>
-      </div>
-    </>
+      <ThemeProvider>
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column',
+          minHeight: '100vh'
+        }}>
+          <Header />
+          <main style={{ flex: 1 }}>
+            <AppRoutes />
+          </main>
+          <Footer />
+        </div>
+      </ThemeProvider>
   );
 }
 

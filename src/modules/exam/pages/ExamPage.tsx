@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Box,
   Button,
@@ -17,6 +18,7 @@ import {
 } from "@mui/material";
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
 import js from 'react-syntax-highlighter/dist/esm/languages/hljs/javascript';
+import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import type { Question, ExamResult, ExamSummary } from "../exam.models";
 
 SyntaxHighlighter.registerLanguage('javascript', js);
@@ -24,6 +26,7 @@ SyntaxHighlighter.registerLanguage('javascript', js);
 const TIME_LIMIT = 10 * 60; // 10 minutes in seconds
 
 export default function ExamPage() {
+  const { t } = useTranslation();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -109,18 +112,18 @@ export default function ExamPage() {
         {/* Header */}
         <Box sx={{ mb: 4 }}>
           <Typography variant="h4" gutterBottom align="center">
-            Tech Exam
+            {t('exam.title')}
           </Typography>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography variant="subtitle1" color="text.secondary">
-              Question {currentQuestionIndex + 1} of {questions.length}
+              {t('exam.question')} {currentQuestionIndex + 1} {t('exam.of')} {questions.length}
             </Typography>
             <Typography variant="subtitle1" color="text.secondary">
-              Time Left: {minutes}:{seconds.toString().padStart(2, '0')}
+              {t('exam.timeLeft')}: {minutes}:{seconds.toString().padStart(2, '0')}
             </Typography>
           </Box>
           <Typography variant="body2" color="text.secondary" align="center">
-            Technology: {currentQuestion.tech}
+            {t('exam.technology')}: {currentQuestion.tech}
           </Typography>
         </Box>
 
@@ -130,18 +133,27 @@ export default function ExamPage() {
             <Card variant="outlined" sx={{ height: '100%' }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  Question
+                  {t('exam.question')}
                 </Typography>
                 <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', mb: 2 }}>
-                  {currentQuestion.question}
+                  {currentQuestion.question.split('\n\n')[0]}
                 </Typography>
                 {currentQuestion.code && (
-                  <SyntaxHighlighter
-                    language="javascript"
-                    customStyle={{ borderRadius: '4px' }}
-                  >
-                    {currentQuestion.code}
-                  </SyntaxHighlighter>
+                  <Box sx={{ mt: 2, mb: 2 }}>
+                    <SyntaxHighlighter
+                      language="javascript"
+                      style={docco}
+                      customStyle={{
+                        borderRadius: '4px',
+                        padding: '16px',
+                        fontSize: '14px',
+                        backgroundColor: '#f8f9fa',
+                        border: '1px solid #e9ecef'
+                      }}
+                    >
+                      {currentQuestion.code}
+                    </SyntaxHighlighter>
+                  </Box>
                 )}
               </CardContent>
             </Card>
@@ -152,10 +164,10 @@ export default function ExamPage() {
             <Card variant="outlined" sx={{ height: '100%' }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  Your Answer
+                  {t('exam.yourAnswer')}
                 </Typography>
                 <FormControl component="fieldset" sx={{ width: '100%' }}>
-                  <FormLabel component="legend">Select your answer:</FormLabel>
+                  <FormLabel component="legend">{t('exam.selectAnswer')}</FormLabel>
                   <RadioGroup
                     value={answers[currentQuestion.id] || ""}
                     onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
@@ -191,7 +203,7 @@ export default function ExamPage() {
             onClick={handlePrevious}
             disabled={currentQuestionIndex === 0}
           >
-            Previous
+            {t('exam.previous')}
           </Button>
           {isLastQuestion ? (
             <Button
@@ -199,14 +211,14 @@ export default function ExamPage() {
               color="primary"
               onClick={handleSubmit}
             >
-              Submit Exam
+              {t('exam.submit')}
             </Button>
           ) : (
             <Button
               variant="contained"
               onClick={handleNext}
             >
-              Next
+              {t('exam.next')}
             </Button>
           )}
         </Box>

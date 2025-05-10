@@ -1,0 +1,59 @@
+{
+  "common": {
+    "home": "בית",
+    "settings": "הגדרות",
+    "language": "שפה",
+    "theme": "ערכת נושא",
+    "darkMode": "מצב כהה",
+    "lightMode": "מצב בהיר"
+  },
+  "exam": {
+    "title": "מבחן",
+    "configure": "הגדר את המבחן שלך",
+    "selectTech": "בחר טכנולוגיה",
+    "selectQuestions": "מספר שאלות",
+    "startExam": "התחל מבחן",
+    "question": "שאלה",
+    "questions": "שאלות",
+    "yourAnswer": "התשובה שלך",
+    "selectAnswer": "בחר את התשובה שלך",
+    "previous": "הקודם",
+    "next": "הבא",
+    "submit": "סיים מבחן",
+    "timeLeft": "זמן נותר",
+    "of": "מתוך",
+    "technology": "טכנולוגיה",
+    "welcome": {
+      "title": "ברוכים הבאים למבחן {{tech}}",
+      "details": "פרטי המבחן",
+      "questions": "יוצגו בפניך {{count}} שאלות בנושא {{tech}}",
+      "timeLimit": "מגבלת זמן: {{time}} דקות",
+      "notes": "הערות חשובות",
+      "navigation": "ניתן לנווט בין השאלות באמצעות כפתורי הקודם והבא",
+      "timer": "טיימר יוצג בראש הדף",
+      "noPause": "לא ניתן להשהות את המבחן לאחר תחילתו",
+      "autoSubmit": "המבחן יוגש אוטומטית כאשר הזמן ייגמר",
+      "start": "התחל מבחן"
+    },
+    "results": {
+      "title": "תוצאות המבחן",
+      "summary": "סיכום",
+      "totalQuestions": "סה״כ שאלות",
+      "correctAnswers": "תשובות נכונות",
+      "score": "ציון",
+      "detailedResults": "תוצאות מפורטות",
+      "question": "שאלה",
+      "yourAnswer": "התשובה שלך",
+      "correctAnswer": "התשובה הנכונה",
+      "correct": "נכון",
+      "incorrect": "שגוי",
+      "startNewQuiz": "התחל מבחן חדש"
+    }
+  },
+  "footer": {
+    "allRightsReserved": "כל הזכויות שמורות.",
+    "privacyPolicy": "מדיניות פרטיות",
+    "termsOfService": "תנאי שימוש",
+    "contact": "צור קשר"
+  }
+} 

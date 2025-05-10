@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Box,
   Button,
@@ -8,7 +9,6 @@ import {
   Container,
   FormControl,
   FormControlLabel,
-  FormLabel,
   Paper,
   Radio,
   RadioGroup,
@@ -19,9 +19,10 @@ import type { Tech } from "../exam.models";
 import { examService } from "../exam.service";
 
 export default function ExamConfigPage() {
+  const { t } = useTranslation();
   const [techs, setTechs] = useState<Tech[]>([]);
   const [selectedTech, setSelectedTech] = useState("");
-  const [questionCount, setQuestionCount] = useState(10);
+  const [questionCount, setQuestionCount] = useState(5);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,6 +30,9 @@ export default function ExamConfigPage() {
       try {
         const techs = await examService.getTechs();
         setTechs(techs);
+        if (techs.length > 0) {
+          setSelectedTech(techs[0].id);
+        }
       } catch (err) {
         console.error("Failed to load technologies:", err);
       }
@@ -64,19 +68,18 @@ export default function ExamConfigPage() {
     <Container maxWidth="md" sx={{ py: 4 }}>
       <Paper elevation={3} sx={{ p: 4 }}>
         <Typography variant="h4" gutterBottom align="center">
-          Configure Your Exam
+          {t('exam.configure')}
         </Typography>
 
         <Grid container spacing={4}>
           {/* Technology Selection */}
           <Grid size={6}>
-            <Card variant="outlined">
+            <Card variant="outlined" sx={{ height: '100%' }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  Select Technology
+                  {t('exam.selectTech')}
                 </Typography>
-                <FormControl component="fieldset">
-                  <FormLabel component="legend">Choose a technology to test:</FormLabel>
+                <FormControl component="fieldset" fullWidth>
                   <RadioGroup
                     value={selectedTech}
                     onChange={(e) => setSelectedTech(e.target.value)}
@@ -97,13 +100,12 @@ export default function ExamConfigPage() {
 
           {/* Question Count Selection */}
           <Grid size={6}>
-            <Card variant="outlined">
+            <Card variant="outlined" sx={{ height: '100%' }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  Number of Questions
+                  {t('exam.selectQuestions')}
                 </Typography>
-                <FormControl component="fieldset">
-                  <FormLabel component="legend">Select number of questions:</FormLabel>
+                <FormControl component="fieldset" fullWidth>
                   <RadioGroup
                     value={questionCount}
                     onChange={(e) => setQuestionCount(Number(e.target.value))}
@@ -113,7 +115,7 @@ export default function ExamConfigPage() {
                         key={count}
                         value={count}
                         control={<Radio />}
-                        label={`${count} questions`}
+                        label={`${count} ${t('exam.questions')}`}
                       />
                     ))}
                   </RadioGroup>
@@ -130,7 +132,7 @@ export default function ExamConfigPage() {
             onClick={handleStart}
             sx={{ minWidth: 200 }}
           >
-            Start Exam
+            {t('exam.startExam')}
           </Button>
         </Box>
       </Paper>
