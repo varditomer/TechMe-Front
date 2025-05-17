@@ -1,0 +1,17 @@
+.puzzle-card {
+  position: relative;
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  overflow: visible;
+  margin: 16px 0;
+}
+
+.puzzle-card-top-left {
+  clip-path: path('M0,24 Q0,0 24,0 L176,0 Q200,0 200,24 L200,176 Q200,200 176,200 L24,200 Q0,200 0,176 Z M0,60 Q20,80 0,100 Q-20,80 0,60 Z M60,0 Q80,20 100,0 Q80,-20 60,0 Z');
+}
+
+.puzzle-card .MuiCard-root {
+  background: transparent;
+  box-shadow: none;
+} 
